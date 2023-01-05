@@ -4,7 +4,7 @@ import React from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../util";
 
-export default function Movies() {
+export default function MyMovies() {
   return (
     <SafeAreaWrap>
       <ScrollWrap>

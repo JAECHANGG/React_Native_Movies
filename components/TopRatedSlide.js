@@ -1,9 +1,19 @@
 import { getImgPath } from "../util";
 import styled from "@emotion/native";
+import { useNavigation } from "@react-navigation/native";
 
 export default function TopRatedSlide({ top }) {
+  const navigation = useNavigation();
+
   return (
-    <VWrapper>
+    <VWrapper
+      onPress={() =>
+        navigation.navigate("StackNav", {
+          screen: "Detail",
+          params: { movieId: top.id },
+        })
+      }
+    >
       <TRPoster
         source={{
           url: getImgPath(top.poster_path),
@@ -36,7 +46,6 @@ const TRTitle = styled.Text`
 const VWrapper = styled.TouchableOpacity`
   background-color: black;
   border-radius: 5px;
-  margin-right: 10px;
 `;
 
 const TRColumn = styled.View`

@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import {
   DarkTheme,
   DefaultTheme,
@@ -8,16 +7,24 @@ import Root from "./navigation/Root";
 import { useColorScheme } from "react-native";
 import { ThemeProvider } from "@emotion/react";
 import { darkTheme, lightTheme } from "./theme";
-import Movies from "./screen/Movies";
+import { QueryClient, QueryClientProvider } from "react-query";
+
+// 리액트 쿼리 사용하기 위해 QueryClient 메서드를 사용한다.
+// 전체 컴포넌트를 QueryClientProvider 컴포넌트로 감싸준다.
+// QueryClientProvider는 client props를 가지며 client=queryClient로 설정한다.
+// queryClient는 저장되어 있는 cache에 접근할 수 있는 총 관리자
+const queryClient = new QueryClient();
 
 export default function App() {
   const isDark = useColorScheme() === "dark";
   return (
-    <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
-      <NavigationContainer theme={isDark ? DarkTheme : DefaultTheme}>
-        <Root />
-      </NavigationContainer>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
+        <NavigationContainer theme={isDark ? DarkTheme : DefaultTheme}>
+          <Root />
+        </NavigationContainer>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 

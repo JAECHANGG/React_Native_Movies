@@ -1,9 +1,19 @@
 import styled from "@emotion/native";
+import { useNavigation } from "@react-navigation/native";
 import { getImgPath } from "../util";
 
 export default function UpComingSlide({ upComing }) {
+  const navigation = useNavigation();
+
   return (
-    <UpcomingRow onPress={() => {}}>
+    <UpcomingRow
+      onPress={() => {
+        navigation.navigate("StackNav", {
+          screen: "Detail",
+          params: { movieId: upComing.id },
+        });
+      }}
+    >
       <UpcomingPoster
         source={{
           url: getImgPath(upComing.poster_path),
@@ -24,7 +34,6 @@ export default function UpComingSlide({ upComing }) {
 const UpcomingRow = styled.TouchableOpacity`
   flex-direction: row;
   margin-left: 20px;
-  margin-bottom: 20px;
 `;
 const UpcomingPoster = styled.Image`
   width: 100px;
