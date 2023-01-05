@@ -2,7 +2,7 @@ import { getImgPath } from "../util";
 import styled from "@emotion/native";
 import { useNavigation } from "@react-navigation/native";
 
-export default function TopRatedSlide({ top }) {
+export default function TopRatedSlide({ movie }) {
   const navigation = useNavigation();
 
   return (
@@ -10,20 +10,20 @@ export default function TopRatedSlide({ top }) {
       onPress={() =>
         navigation.navigate("StackNav", {
           screen: "Detail",
-          params: { movieId: top.id },
+          params: { movieId: movie.id },
         })
       }
     >
       <TRPoster
         source={{
-          url: getImgPath(top.poster_path),
+          url: getImgPath(movie.poster_path),
         }}
       />
       <TRColumn>
-        <Rating>⭐️{top.vote_average}/10</Rating>
+        <Rating>⭐️{movie.vote_average}/10</Rating>
         <TRTitle>
-          {top.title.slice(0, 11)}
-          {top.title.length > 11 && "..."}
+          {movie.title.slice(0, 11)}
+          {movie.title.length > 11 && "..."}
         </TRTitle>
       </TRColumn>
     </VWrapper>

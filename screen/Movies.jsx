@@ -8,6 +8,7 @@ import TopRatedSlide from "../components/TopRatedSlide";
 import UpComingSlide from "../components/UpComingSlide";
 import { useQuery, useQueryClient, useInfiniteQuery } from "react-query";
 import { getNowPlayings, getTopRated, getUpcomings } from "../api";
+import { authService } from "../firebase";
 
 export default function Movies() {
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -77,7 +78,7 @@ export default function Movies() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 20 }}
             data={topRatedData.results}
-            renderItem={({ item }) => <TopRatedSlide top={item} />}
+            renderItem={({ item }) => <TopRatedSlide movie={item} />}
             keyExtractor={(item) => item.id}
             ItemSeparatorComponent={<View style={{ width: 10 }} />}
           />
@@ -85,7 +86,7 @@ export default function Movies() {
         </>
       }
       data={upcomingData.pages.map((page) => page.results).flat()}
-      renderItem={({ item }) => <UpComingSlide upComing={item} />}
+      renderItem={({ item }) => <UpComingSlide movie={item} />}
       keyExtractor={(item) => item.id}
       refreshing={isRefreshing}
       onRefresh={onRefresh}

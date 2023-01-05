@@ -2,29 +2,27 @@ import styled from "@emotion/native";
 import { useNavigation } from "@react-navigation/native";
 import { getImgPath } from "../util";
 
-export default function UpComingSlide({ upComing }) {
+export default function UpComingSlide({ movie }) {
   const navigation = useNavigation();
 
+  const { navigate } = useNavigation();
+  const goToDetail = () => {
+    navigate("Stack", { screen: "Detail", params: { movieId: movie.id } });
+  };
+
   return (
-    <UpcomingRow
-      onPress={() => {
-        navigation.navigate("StackNav", {
-          screen: "Detail",
-          params: { movieId: upComing.id },
-        });
-      }}
-    >
+    <UpcomingRow onPress={goToDetail}>
       <UpcomingPoster
         source={{
-          url: getImgPath(upComing.poster_path),
+          url: getImgPath(movie.poster_path),
         }}
       />
       <UpcomingColumn>
-        <UpcomingTitle>{upComing.title}</UpcomingTitle>
-        <Release>{upComing.release_date}</Release>
+        <UpcomingTitle>{movie.title}</UpcomingTitle>
+        <Release>{movie.release_date}</Release>
         <UpcomingOverview>
-          {upComing.overview.slice(0, 70)}
-          {upComing.overview.length > 70 && "..."}
+          {movie.overview.slice(0, 70)}
+          {movie.overview.length > 70 && "..."}
         </UpcomingOverview>
       </UpcomingColumn>
     </UpcomingRow>

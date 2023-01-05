@@ -2,28 +2,26 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Movies from "../screen/Movies";
 import My from "../screen/My";
-import { MaterialIcons } from "@expo/vector-icons";
-import { Foundation } from "@expo/vector-icons";
+import { GREEN_COLOR, YELLOW_COLOR } from "../colors";
 import { useColorScheme } from "react-native";
-import { DARK_COLOR } from "../colors";
+import { MaterialIcons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 
 const Tab = createBottomTabNavigator();
 
-export default function BottomTabNav() {
+export default function Tabs() {
   const isDark = useColorScheme() === "dark";
-
   return (
     <Tab.Navigator
       screenOptions={{
+        headerTintColor: isDark ? YELLOW_COLOR : GREEN_COLOR,
+        tabBarActiveTintColor: isDark ? YELLOW_COLOR : GREEN_COLOR,
         tabBarLabelPosition: "beside-icon",
+        headerTitleAlign: "center",
       }}
-      sceneContainerStyle={{ backgroundColor: isDark ? DARK_COLOR : "white" }}
     >
       <Tab.Screen
         options={{
-          title: "영화",
-          headerTitleAlign: "center",
-          tabBarLabel: "Movies",
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="local-movies" size={size} color={color} />
           ),
@@ -33,10 +31,8 @@ export default function BottomTabNav() {
       />
       <Tab.Screen
         options={{
-          title: "내가 작성한 댓글",
-          tabBarLabel: "My",
           tabBarIcon: ({ color, size }) => (
-            <Foundation name="social-myspace" size={size} color={color} />
+            <AntDesign name="profile" size={size} color={color} />
           ),
         }}
         name="My"

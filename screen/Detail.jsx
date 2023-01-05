@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  Linking,
-  StyleSheet,
-  useColorScheme,
-} from "react-native";
+import { FlatList, Linking, StyleSheet, useColorScheme } from "react-native";
 import styled from "@emotion/native";
-
+import { getImgPath, SCREEN_WIDTH } from "../util";
+import { SCREEN_HEIGHT } from "../util";
 import { LinearGradient } from "expo-linear-gradient";
 import { AntDesign } from "@expo/vector-icons";
-import { getImgPath, SCREEN_HEIGHT } from "../util";
 import { useQuery } from "react-query";
 import { getDetail } from "../api";
+import Loader from "../components/Loader";
+
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import { authService, dbService } from "../firebase";
+import ReviewCard from "../components/ReviewCard";
+import ReviewModal from "../components/ReviewModal";
 
 export default function Detail({
   navigation: { navigate },
@@ -19,22 +20,55 @@ export default function Detail({
     params: { movieId },
   },
 }) {
+  const [reviews, setReviews] = useState([]);
+  const [isOpenModal, setIsOpenModal] = useState(false);
+
   const isDark = useColorScheme() === "dark";
-
-  // 인자를 넣어주지 않아도 리액트 쿼리에서 자동으로 매개변수로 객체가 넘어간다.
-  const { data, isLoading } = useQuery(["Detail", movieID], getDetail);
-
   const openYoutube = async (key) => {
     const url = `https://www.youtube.com/watch?v=${key}`;
     await Linking.openURL(url);
   };
 
-  if (isLoading) {
-    return (
-      <Loader>
-        <ActivityIndicator />
-      </Loader>
+  const { data, isLoading } = useQuery(["movie", movieId], getDetail);
+
+  const handleAdding = async () => {
+    const isLogin = !!authService.currentUser;
+    if (!isLogin) {
+      navigate("Login");
+      return;
+    }
+    setIsOpenModal(true);
+  };
+
+  // useEffect(() => {
+  //   const getReviews = async () => {
+  //     const q = query(
+  //       collection(dbService, "reviews")
+  //       // orderBy("createdAt", "desc")
+  //     );
+  //     const querySnapshot = await getDocs(q);
+  //     console.log("querySnapshot:", querySnapshot);
+  //   };
+  //   getReviews();
+  // }, []);
+
+  useEffect(() => {
+    const q = query(
+      collection(dbService, "reviews"),
+      orderBy("createdAt", "desc")
     );
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const newReviews = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setReviews(newReviews);
+    });
+    return () => unsubscribe;
+  }, []);
+
+  if (isLoading) {
+    return <Loader />;
   }
 
   return (
@@ -64,17 +98,34 @@ export default function Detail({
         ))}
       </YoutubeList>
       <SectionTitle>Reviews</SectionTitle>
-      <AddReview onPress={() => {}}>
+      <AddReview onPress={handleAdding}>
         <TempText>Add Review</TempText>
       </AddReview>
+      <FlatList
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          marginBottom: 50,
+          justifyContent: "flex-start",
+        }}
+        keyExtractor={(item) => item.id}
+        horizontal
+        data={reviews}
+        ItemSeparatorComponent={HSeprator}
+        renderItem={({ item }) => {
+          if (item.movieId === movieId) {
+            return <ReviewCard review={item} />;
+          }
+        }}
+      />
+      <ReviewModal
+        movieId={movieId}
+        isOpenModal={isOpenModal}
+        setIsOpenModal={setIsOpenModal}
+      />
     </Container>
   );
 }
-const Loader = styled.View`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-`;
 
 const Container = styled.ScrollView``;
 const View = styled.View`
@@ -92,7 +143,7 @@ const Title = styled.Text`
   margin-left: 20px;
 `;
 const Overview = styled.Text`
-  color: ${(props) => props.theme.upcomingText};
+  color: ${(props) => props.theme.color.overview};
   font-size: 15px;
   font-weight: 400;
   padding: 20px;
@@ -103,7 +154,7 @@ const Row = styled.TouchableOpacity`
   margin-bottom: 10px;
 `;
 const VideoName = styled.Text`
-  color: ${(props) => props.theme.upcomingText};
+  color: ${(props) => props.theme.color.title};
   font-size: 16px;
   line-height: 24px;
   font-weight: 500;
@@ -115,7 +166,7 @@ const YoutubeList = styled.View`
 `;
 
 const SectionTitle = styled.Text`
-  color: ${(props) => props.theme.upcomingText};
+  color: ${(props) => props.theme.color.listTitle};
   font-size: 30px;
   margin-top: 20px;
   margin-left: 20px;
@@ -129,11 +180,11 @@ const AddReview = styled.TouchableOpacity`
   border-radius: 5px;
   border-width: 1px;
   align-items: center;
-  border-color: ${(props) => props.theme.upcomingText};
+  border-color: ${(props) => props.theme.color.title};
 `;
 const TempText = styled.Text`
   font-size: 20px;
-  color: ${(props) => props.theme.upcomingText};
+  color: ${(props) => props.theme.color.title};
 `;
 
 const HSeprator = styled.View`
